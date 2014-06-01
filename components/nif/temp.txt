@@ -1,0 +1,26 @@
+//Turn an Ogre::Quaternion into an output string in the same format NifSkope uses
+std::string QuaternionToStr(Ogre::Quaternion in)
+{
+    return "Y " + Ogre::StringConverter::toString(in.getYaw())
+        + " P " + Ogre::StringConverter::toString(in.getPitch())
+        + " R " + Ogre::StringConverter::toString(in.getRoll());
+}
+
+        Nif::NiKeyframeData* last = static_cast<Nif::NiKeyframeData*>(records[i-1]);
+        float time[] = {last->mRotations.mKeys[0].mTime,last->mRotations.mKeys[1].mTime};
+        Ogre::Quaternion value[] = {last->mRotations.mKeys[0].mValue,last->mRotations.mKeys[1].mValue};
+        warn("\n  Has # mRotations keys: " 
+            + Ogre::StringConverter::toString(last->mRotations.mKeys.size())
+            +"\n    Key 0 time: " 
+            + Ogre::StringConverter::toString(time[0])
+            +"\n    Key 1 time: " 
+            + Ogre::StringConverter::toString(time[1])
+            +"\n    Key 0 value: " 
+            + Ogre::StringConverter::toString(value[0]) + " -> " + QuaternionToStr(value[0])
+            +"\n    Key 1 value: " 
+            + Ogre::StringConverter::toString(value[1]) + " -> " + QuaternionToStr(value[1])
+            + "\n  Has # mTranslations keys: " 
+            + Ogre::StringConverter::toString(last->mTranslations.mKeys.size())
+            + "\n  Has # mScales keys: " 
+            + Ogre::StringConverter::toString(last->mScales.mKeys.size())
+        );

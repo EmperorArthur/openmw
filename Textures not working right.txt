@@ -1,0 +1,2 @@
+meshes\Ac\Anim_Basket.nif
+    XYZ Rotation

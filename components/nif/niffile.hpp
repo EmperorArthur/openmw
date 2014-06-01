@@ -215,6 +215,8 @@ struct KeyListT {
             //KeyGroup (see http://niftools.sourceforge.net/doc/nif/NiKeyframeData.html)
             //Chomp unknown and possibly unused float
             nif->getFloat();
+
+            std::vector< KeyT<float> > Keys_XYZ[3];
             for(size_t i=0;i<3;++i)
             {
                 unsigned int numKeys = nif->getInt();
@@ -226,16 +228,29 @@ struct KeyListT {
                         nif->file->fail("XYZ_ROTATION_KEY's KeyGroup keyType must be '1' (Linear Interpolation).  Retrieved Value: "+Ogre::StringConverter::toString(interpolationTypeAgain));
                         return;
                     }
+                    (Keys_XYZ[i]).resize(numKeys);
                     for(size_t j = 0;j < numKeys;j++)
                     {
-                        //For now just chomp these
-                        nif->getFloat();
-                        nif->getFloat();
+                        KeyT<float> &key = (Keys_XYZ[i])[j];
+                        key.mTime = nif->getFloat();
+                        key.mValue = nif->getFloat();
                     }
                 }
-                nif->file->warn("XYZ_ROTATION_KEY read, but not used!");
             }
-    }
+            for(size_t i=0;i<3;++i)
+            {
+                for(size_t j=0;j<(Keys_XYZ[i]).size();++j)
+                {
+                    std::string iStr(Ogre::StringConverter::toString(i));
+                    std::string jStr(Ogre::StringConverter::toString(j));
+                    std::string mTStr(Ogre::StringConverter::toString((Keys_XYZ[i])[j].mTime));
+                    std::string mVStr(Ogre::StringConverter::toString((Keys_XYZ[i])[j].mValue));
+                    std::string outStr("Keys_XYZ["+iStr+"]["+jStr+"].mTime="+mTStr+"; Keys_XYZ["+iStr+"]["+jStr+"].mValue="+mVStr);
+                    nif->file->warn(outStr.c_str());
+                }
+            }
+            nif->file->warn("XYZ_ROTATION_KEY read, but not used!");
+        }
         else if (mInterpolationType == 0)
         {
             if (count != 0)
