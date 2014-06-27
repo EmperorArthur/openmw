@@ -153,22 +153,30 @@ template<typename T, T (NIFStream::*getValue)()>
 struct KeyListT {
     typedef std::vector< KeyT<T> > VecType;
 
+    static const unsigned int sNoInterpolation = 0;
     static const unsigned int sLinearInterpolation = 1;
     static const unsigned int sQuadraticInterpolation = 2;
     static const unsigned int sTBCInterpolation = 3;
     static const unsigned int sXYZInterpolation = 4;
 
-    unsigned int mInterpolationType;
     VecType mKeys;
 
-    KeyListT() : mInterpolationType(sLinearInterpolation) {}
+    //Initializer
+    KeyListT() : mInterpolationType(sNoInterpolation) {}
+
+    //getter that makes sure interpolation type is in bounds
+    unsigned int getInterpolationType() const
+    {
+        //This should never happen and indicates a file error.
+        if(mInterpolationType > 4)
+            throw std::out_of_range ("Impossible Interpolation Type (Should be 0-4)");
+        return mInterpolationType;
+    }
 
     //Read in a KeyGroup (see http://niftools.sourceforge.net/doc/nif/NiKeyframeData.html)
     void read(NIFStream *nif, bool force=false)
     {
         assert(nif);
-
-        mInterpolationType = 0;
 
         size_t count = nif->getUInt();
         if(count == 0 && !force)
@@ -218,7 +226,7 @@ struct KeyListT {
             if ( count != 1 )
                 nif->file->fail("XYZ_ROTATION_KEY count should always be '1' .  Retrieved Value: "+Ogre::StringConverter::toString(count));
         }
-        else if (0 == mInterpolationType)
+        else if (sNoInterpolation == mInterpolationType)
         {
             if (count != 0)
                 nif->file->fail("Interpolation type 0 doesn't work with keys");
@@ -228,6 +236,8 @@ struct KeyListT {
     }
 
 private:
+    unsigned int mInterpolationType;
+
     static void readTimeAndValue(NIFStream &nif, KeyT<T> &key)
     {
         key.mTime = nif.getFloat();

@@ -421,7 +421,7 @@ struct NiKeyframeData : public Record
     void read(NIFStream *nif)
     {
         mRotations.read(nif);
-        if(mRotations.mInterpolationType == mRotations.sXYZInterpolation)
+        if(mRotations.getInterpolationType() == QuaternionKeyList::sXYZInterpolation)
         {
             //Chomp unused float
             nif->getFloat();
