@@ -16,12 +16,11 @@
 #include <OgreQuaternion.h>
 #include <OgreStringConverter.h>
 
+#include "niffile.hpp"
 #include "niftypes.hpp"
 
 namespace Nif
 {
-
-class NIFFile;
 
 class NIFStream {
 
@@ -103,6 +102,15 @@ public:
             items.push_back(get<T>());
         }
         return items;
+    }
+
+    template <typename T>
+    T getIfVer(unsigned int testVersion)
+    {
+        if (file->getVersion() == testVersion)
+            return get<T>();
+        else
+            return T();
     }
 
 };

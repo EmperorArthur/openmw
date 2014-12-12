@@ -10,16 +10,6 @@
 
 #include "record.hpp"
 
-//\FIXME this is a C macro hack to make life easier, it needs to be converted to a template function
-#define GETIFVER(testVersion, operation, default_value) (ver == testVersion)? operation : default_value;
-template <typename T>
-T getIfVer(unsigned int testVersion, T (*operation)(),T default_value){
-    if (ver == testVersion)
-        return operation();
-    else
-        return default_value;
-}
-
 namespace Nif
 {
 
@@ -92,6 +82,9 @@ public:
 
     /// Get the name of the file
     std::string getFilename(){ return filename; }
+
+    /// Get the file's version
+    unsigned int getVersion(){ return ver; }
 };
 
 
