@@ -85,6 +85,8 @@ public:
     std::string getString();
     ///This is special since the version string doesn't start with a number, and ends with "\n"
     std::string getVersionString();
+    ///This is a strange type used by newer nif formats
+    std::string getShortString();
 
     //Templated functions to handle reads
     template <typename T>

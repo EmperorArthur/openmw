@@ -105,6 +105,14 @@ std::string NIFStream::getVersionString()
 {
     return inp->getLine();
 }
+std::string NIFStream::getShortString()
+{
+    //Size is big endian format, so it needs special processing
+    uint8_t short_buffer[2];
+    if(inp->read(short_buffer, 2) != 2) return 0;
+    short size = (short_buffer[0]<<8) | short_buffer[1];
+    return getString(size);
+}
 
 template <>
 char NIFStream::get<char>(){ return getChar(); }
