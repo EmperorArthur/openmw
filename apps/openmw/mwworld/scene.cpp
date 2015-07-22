@@ -326,20 +326,17 @@ namespace MWWorld
 
         const int halfGridSize = Settings::Manager::getInt("exterior cell load distance", "Cells");
 
-        CellStoreCollection::iterator active = mActiveCells.begin();
-        while (active!=mActiveCells.end())
+        for(auto& active : mActiveCells)
         {
-            if ((*active)->getCell()->isExterior())
+            if (!(*active)->getCell()->isExterior())
             {
-                if (std::abs (X-(*active)->getCell()->getGridX())<=halfGridSize &&
-                    std::abs (Y-(*active)->getCell()->getGridY())<=halfGridSize)
-                {
-                    // keep cells within the new grid
-                    ++active;
-                    continue;
-                }
+                unloadCell(active);
             }
-            unloadCell (active++);
+            if (std::abs (X-(*active)->getCell()->getGridX())>halfGridSize &&
+                    std::abs (Y-(*active)->getCell()->getGridY())>halfGridSize)
+            {
+                unloadCell(active);
+            }
         }
 
         int refsToLoad = 0;
