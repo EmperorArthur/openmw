@@ -34,6 +34,8 @@
 #include <osg/TexEnv>
 #include <osg/TexEnvCombine>
 
+#include <osgFX/BumpMapping>
+
 #include <components/nif/node.hpp>
 #include <components/sceneutil/util.hpp>
 #include <components/sceneutil/skeleton.hpp>
@@ -1271,15 +1273,11 @@ namespace NifOsg
                             case Nif::NiTexturingProperty::GlowTexture:
                             case Nif::NiTexturingProperty::DarkTexture:
                             case Nif::NiTexturingProperty::DetailTexture:
+                            case Nif::NiTexturingProperty::BumpTexture:
                                 break;
                             case Nif::NiTexturingProperty::GlossTexture:
                             {
                                 std::cerr << "NiTexturingProperty::GlossTexture in " << mFilename << " not currently used." << std::endl;
-                                continue;
-                            }
-                            case Nif::NiTexturingProperty::BumpTexture:
-                            {
-                                std::cerr << "NiTexturingProperty::BumpTexture in " << mFilename << " not currently used." << std::endl;
                                 continue;
                             }
                             case Nif::NiTexturingProperty::DecalTexture:
@@ -1359,6 +1357,21 @@ namespace NifOsg
                             texEnv->setSource0_RGB(GL_PREVIOUS_ARB);
                             texEnv->setSource1_RGB(GL_TEXTURE);
                             stateset->setTextureAttributeAndModes(texUnit, texEnv, osg::StateAttribute::ON);
+                            break;
+                        }
+                        case Nif::NiTexturingProperty::BumpTexture:
+                        {
+                            osg::ref_ptr<osgFX::BumpMapping> bumpMap = new osgFX::BumpMapping;
+                            bumpMap->setOverrideNormalMapTexture(texture2d);
+                            bumpMap->setOverrideDiffuseTexture(texture2d);
+                            bumpMap->prepareNode(node);
+
+                            for (unsigned int j = 0; j<node->getNumParents(); ++j)
+                            {
+                                osg::ref_ptr<osg::Group> parentGroup = node->getParent(j);
+                                parentGroup->addChild(bumpMap);
+                            }
+                            std::cerr << "NiTexturingProperty::BumpTexture in " << mFilename << " TESTING!!!" << std::endl;
                             break;
                         }
                         }
