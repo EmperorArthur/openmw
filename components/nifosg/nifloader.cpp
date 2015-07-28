@@ -1321,7 +1321,11 @@ namespace NifOsg
 
                         stateset->setTextureAttributeAndModes(texUnit, texture2d, osg::StateAttribute::ON);
 
-                        if (i == Nif::NiTexturingProperty::GlowTexture)
+                        switch(i)
+                        {
+                        case Nif::NiTexturingProperty::BaseTexture:
+                            break;
+                        case Nif::NiTexturingProperty::GlowTexture:
                         {
                             osg::TexEnvCombine* texEnv = new osg::TexEnvCombine;
                             texEnv->setCombine_Alpha(osg::TexEnvCombine::REPLACE);
@@ -1331,14 +1335,16 @@ namespace NifOsg
                             texEnv->setSource1_RGB(osg::TexEnvCombine::TEXTURE);
 
                             stateset->setTextureAttributeAndModes(texUnit, texEnv, osg::StateAttribute::ON);
+                            break;
                         }
-                        else if (i == Nif::NiTexturingProperty::DarkTexture)
+                        case Nif::NiTexturingProperty::DarkTexture:
                         {
                             osg::TexEnv* texEnv = new osg::TexEnv;
                             texEnv->setMode(osg::TexEnv::MODULATE);
                             stateset->setTextureAttributeAndModes(texUnit, texEnv, osg::StateAttribute::ON);
+                            break;
                         }
-                        else if (i == Nif::NiTexturingProperty::DetailTexture)
+                        case Nif::NiTexturingProperty::DetailTexture:
                         {
                             osg::TexEnvCombine* texEnv = new osg::TexEnvCombine;
                             texEnv->setScale_RGB(2.f);
@@ -1353,6 +1359,8 @@ namespace NifOsg
                             texEnv->setSource0_RGB(GL_PREVIOUS_ARB);
                             texEnv->setSource1_RGB(GL_TEXTURE);
                             stateset->setTextureAttributeAndModes(texUnit, texEnv, osg::StateAttribute::ON);
+                            break;
+                        }
                         }
 
                         boundTextures.push_back(tex.uvSet);
