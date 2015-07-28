@@ -73,10 +73,19 @@ namespace MWGui
         MWWorld::Ptr object = item.mBase;
         int count = item.mCount;
         bool shift = MyGUI::InputManager::getInstance().isShiftPressed();
-        if (MyGUI::InputManager::getInstance().isControlPressed())
-            count = 1;
+        bool control = MyGUI::InputManager::getInstance().isControlPressed();
 
         mSelectedItem = mSortModel->mapToSource(index);
+
+        if(shift && control)
+        {
+            dragItem (NULL, count);
+            dropItem();
+            return;
+        }
+
+        if (control)
+            count = 1;
 
         if (count > 1 && !shift)
         {
@@ -125,7 +134,8 @@ namespace MWGui
 
     void ContainerWindow::onBackgroundSelected()
     {
-        if (mDragAndDrop->mIsOnDragAndDrop && !dynamic_cast<PickpocketItemModel*>(mModel))
+//         if (mDragAndDrop->mIsOnDragAndDrop && !dynamic_cast<PickpocketItemModel*>(mModel))
+        if (mDragAndDrop->mIsOnDragAndDrop)
             dropItem();
     }
 
@@ -148,6 +158,7 @@ namespace MWGui
 
         mSortModel = new SortFilterItemModel(mModel);
 
+        //Pretty sure this is preventing auto equip
         mItemView->setModel (mSortModel);
         mItemView->resetScrollBars();
 
@@ -175,6 +186,12 @@ namespace MWGui
     void ContainerWindow::close()
     {
         WindowBase::close();
+
+//         if (mPtr.getTypeName() == typeid(ESM::NPC).name())
+        {
+//             mPtr->autoEquip(mPtr);
+//             mModel->update();
+        }
 
         if (dynamic_cast<PickpocketItemModel*>(mModel)
                 // Make sure we were actually closed, rather than just temporarily hidden (e.g. console or main menu opened)
@@ -260,6 +277,7 @@ namespace MWGui
 
     bool ContainerWindow::onTakeItem(const ItemStack &item, int count)
     {
+        return true;
         MWWorld::Ptr player = MWBase::Environment::get().getWorld()->getPlayerPtr();
         // TODO: move to ItemModels
         if (dynamic_cast<PickpocketItemModel*>(mModel)
