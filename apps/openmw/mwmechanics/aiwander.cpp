@@ -1,6 +1,7 @@
 #include "aiwander.hpp"
 
 #include <cfloat>
+#include <iostream>
 
 #include <components/misc/rng.hpp>
 
@@ -254,17 +255,27 @@ namespace MWMechanics
         {
             idleAnimation = getRandomIdle();
 
+            //If we should be moving
             if(!idleAnimation && mDistance)
             {
                 wanderState = Wander_MoveNow;
             }
             else
             {
-                // Play idle animation and recreate vanilla (broken?) behavior of resetting start time of AIWander:
+                // Recreate vanilla (broken?) behavior of resetting start time of AIWander:
                 MWWorld::TimeStamp currentTime = world->getTimeStamp();
                 mStartTime = currentTime;
-                playIdle(actor, idleAnimation);
                 wanderState = Wander_IdleNow;
+            }
+
+            //If we aren't going to just stand
+            if(idleAnimation)
+            {
+                //Attempt to play an animation
+                if(!playIdle(actor, idleAnimation))
+                {
+                    std::cerr<< "Unable to play idle animation "<<idleAnimation<<" for " << actor.getCellRef().getRefId() << std::endl;
+                }
             }
         }
 
@@ -571,13 +582,15 @@ namespace MWMechanics
         actor.getClass().getMovementSettings(actor).mPosition[1] = 0;
     }
 
-    void AiWander::playIdle(const MWWorld::Ptr& actor, unsigned short idleSelect)
+    bool AiWander::playIdle(const MWWorld::Ptr& actor, unsigned short idleSelect)
     {
         if ((GroupIndex_MinIdle <= idleSelect) && (idleSelect <= GroupIndex_MaxIdle))
         {
             const std::string& groupName = sIdleSelectToGroupName[idleSelect - GroupIndex_MinIdle];
-            MWBase::Environment::get().getMechanicsManager()->playAnimationGroup(actor, groupName, 0, 1);
+            return MWBase::Environment::get().getMechanicsManager()->playAnimationGroup(actor, groupName, 0, 1);
         }
+        std::cerr<< "Attempted to play out of range idle animation \""<<idleSelect<<"\" for " << actor.getCellRef().getRefId() << std::endl;
+        return false;
     }
 
     bool AiWander::checkIdle(const MWWorld::Ptr& actor, unsigned short idleSelect)
