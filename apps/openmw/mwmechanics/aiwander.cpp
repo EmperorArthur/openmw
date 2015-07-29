@@ -85,7 +85,7 @@ namespace MWMechanics
     
     AiWander::AiWander(int distance, int duration, int timeOfDay, const std::vector<unsigned char>& idle, bool repeat):
         mDistance(distance), mDuration(duration), mTimeOfDay(timeOfDay), mIdle(idle), mRepeat(repeat)
-      , mStoredInitialActorPosition(false)
+      , mStoredInitialActorPosition(false), bad_idles()
     {
         mIdle.resize(8, 0);
         init();
@@ -271,10 +271,15 @@ namespace MWMechanics
             //If we aren't going to just stand
             if(idleAnimation)
             {
-                //Attempt to play an animation
-                if(!playIdle(actor, idleAnimation))
+                //If the idle animation actually exists
+                if(std::find(bad_idles.begin(), bad_idles.end(), idleAnimation)==bad_idles.end())
                 {
-                    std::cerr<< "Unable to play idle animation "<<idleAnimation<<" for " << actor.getCellRef().getRefId() << std::endl;
+                    //Attempt to play the animation
+                    if(!playIdle(actor, idleAnimation))
+                    {
+                        bad_idles.push_back(idleAnimation);
+                        std::cerr<< "Unable to play idle animation "<<idleAnimation<<" for " << actor.getCellRef().getRefId() << std::endl;
+                    }
                 }
             }
         }
