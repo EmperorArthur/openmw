@@ -1266,32 +1266,6 @@ namespace NifOsg
                 {
                     if (texprop->textures[i].inUse)
                     {
-                        switch(i)
-                        {
-                            //These are handled later on
-                            case Nif::NiTexturingProperty::BaseTexture:
-                            case Nif::NiTexturingProperty::GlowTexture:
-                            case Nif::NiTexturingProperty::DarkTexture:
-                            case Nif::NiTexturingProperty::DetailTexture:
-                            case Nif::NiTexturingProperty::BumpTexture:
-                                break;
-                            case Nif::NiTexturingProperty::GlossTexture:
-                            {
-                                std::cerr << "NiTexturingProperty::GlossTexture in " << mFilename << " not currently used." << std::endl;
-                                continue;
-                            }
-                            case Nif::NiTexturingProperty::DecalTexture:
-                            {
-                                std::cerr << "NiTexturingProperty::DecalTexture in " << mFilename << " not currently used." << std::endl;
-                                continue;
-                            }
-                            default:
-                            {
-                                std::cerr << "Warning: unhandled texture stage " << i << " in " << mFilename << std::endl;
-                                continue;
-                            }
-                        }
-
                         const Nif::NiTexturingProperty::Texture& tex = texprop->textures[i];
                         if(tex.texture.empty())
                         {
@@ -1311,17 +1285,16 @@ namespace NifOsg
                         int wrapT = (clamp) & 0x1;
                         int wrapS = (clamp >> 1) & 0x1;
 
-                        osg::Texture2D* texture2d = textureManager->getTexture2D(filename,
+                        osg::ref_ptr<osg::Texture2D> texture2d = textureManager->getTexture2D(filename,
                               wrapS ? osg::Texture::REPEAT : osg::Texture::CLAMP,
                               wrapT ? osg::Texture::REPEAT : osg::Texture::CLAMP);
 
                         int texUnit = boundTextures.size();
 
-                        stateset->setTextureAttributeAndModes(texUnit, texture2d, osg::StateAttribute::ON);
-
                         switch(i)
                         {
                         case Nif::NiTexturingProperty::BaseTexture:
+                            stateset->setTextureAttributeAndModes(texUnit, texture2d, osg::StateAttribute::ON);
                             break;
                         case Nif::NiTexturingProperty::GlowTexture:
                         {
@@ -1332,6 +1305,7 @@ namespace NifOsg
                             texEnv->setSource0_RGB(osg::TexEnvCombine::PREVIOUS);
                             texEnv->setSource1_RGB(osg::TexEnvCombine::TEXTURE);
 
+                            stateset->setTextureAttributeAndModes(texUnit, texture2d, osg::StateAttribute::ON);
                             stateset->setTextureAttributeAndModes(texUnit, texEnv, osg::StateAttribute::ON);
                             break;
                         }
@@ -1339,6 +1313,8 @@ namespace NifOsg
                         {
                             osg::TexEnv* texEnv = new osg::TexEnv;
                             texEnv->setMode(osg::TexEnv::MODULATE);
+
+                            stateset->setTextureAttributeAndModes(texUnit, texture2d, osg::StateAttribute::ON);
                             stateset->setTextureAttributeAndModes(texUnit, texEnv, osg::StateAttribute::ON);
                             break;
                         }
@@ -1356,6 +1332,8 @@ namespace NifOsg
                             texEnv->setOperand1_RGB(GL_SRC_COLOR);
                             texEnv->setSource0_RGB(GL_PREVIOUS_ARB);
                             texEnv->setSource1_RGB(GL_TEXTURE);
+
+                            stateset->setTextureAttributeAndModes(texUnit, texture2d, osg::StateAttribute::ON);
                             stateset->setTextureAttributeAndModes(texUnit, texEnv, osg::StateAttribute::ON);
                             break;
                         }
@@ -1373,6 +1351,21 @@ namespace NifOsg
                             }
                             std::cerr << "NiTexturingProperty::BumpTexture in " << mFilename << " TESTING!!!" << std::endl;
                             break;
+                        }
+                        case Nif::NiTexturingProperty::GlossTexture:
+                        {
+                            std::cerr << "NiTexturingProperty::GlossTexture in " << mFilename << " not currently used." << std::endl;
+                            continue;
+                        }
+                        case Nif::NiTexturingProperty::DecalTexture:
+                        {
+                            std::cerr << "NiTexturingProperty::DecalTexture in " << mFilename << " not currently used." << std::endl;
+                            continue;
+                        }
+                        default:
+                        {
+                            std::cerr << "Warning: unhandled texture stage " << i << " in " << mFilename << std::endl;
+                            continue;
                         }
                         }
 
