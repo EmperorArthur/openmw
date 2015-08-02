@@ -928,22 +928,22 @@ namespace NifOsg
         void handleTriShape(const Nif::NiTriShape* triShape, osg::Group* parentNode, SceneUtil::CompositeStateSetUpdater* composite, const std::vector<int>& boundTextures, int animflags)
         {
             osg::ref_ptr<osg::Geometry> geometry;
-            if(!triShape->controller.empty())
-            {
-                Nif::ControllerPtr ctrl = triShape->controller;
-                do {
-                    if(ctrl->recType == Nif::RC_NiGeomMorpherController && ctrl->flags & Nif::NiNode::ControllerFlag_Active)
-                    {
-                        geometry = handleMorphGeometry(static_cast<const Nif::NiGeomMorpherController*>(ctrl.getPtr()));
-
-                        osg::ref_ptr<GeomMorpherController> morphctrl = new GeomMorpherController(
-                                    static_cast<const Nif::NiGeomMorpherController*>(ctrl.getPtr())->data.getPtr());
-                        setupController(ctrl.getPtr(), morphctrl, animflags);
-                        geometry->setUpdateCallback(morphctrl);
-                        break;
-                    }
-                } while(!(ctrl=ctrl->next).empty());
-            }
+//             if(!triShape->controller.empty())
+//             {
+//                 Nif::ControllerPtr ctrl = triShape->controller;
+//                 do {
+//                     if(ctrl->recType == Nif::RC_NiGeomMorpherController && ctrl->flags & Nif::NiNode::ControllerFlag_Active)
+//                     {
+//                         geometry = handleMorphGeometry(static_cast<const Nif::NiGeomMorpherController*>(ctrl.getPtr()));
+//
+//                         osg::ref_ptr<GeomMorpherController> morphctrl = new GeomMorpherController(
+//                                     static_cast<const Nif::NiGeomMorpherController*>(ctrl.getPtr())->data.getPtr());
+//                         setupController(ctrl.getPtr(), morphctrl, animflags);
+//                         geometry->setUpdateCallback(morphctrl);
+//                         break;
+//                     }
+//                 } while(!(ctrl=ctrl->next).empty());
+//             }
 
             if (!geometry.get())
                 geometry = new osg::Geometry;
@@ -953,18 +953,18 @@ namespace NifOsg
 
             geode->addDrawable(geometry);
 
-            if (geometry->getDataVariance() == osg::Object::DYNAMIC)
-            {
-                // Add a copy, we will alternate between the two copies every other frame using the FrameSwitch
-                // This is so we can set the DataVariance as STATIC, giving a huge performance boost
-                geometry->setDataVariance(osg::Object::STATIC);
-                osg::ref_ptr<osg::Geode> geode2 = static_cast<osg::Geode*>(osg::clone(geode.get(), osg::CopyOp::DEEP_COPY_NODES|osg::CopyOp::DEEP_COPY_DRAWABLES));
-                osg::ref_ptr<FrameSwitch> frameswitch = new FrameSwitch;
-                frameswitch->addChild(geode);
-                frameswitch->addChild(geode2);
-                parentNode->addChild(frameswitch);
-            }
-            else
+//             if (geometry->getDataVariance() == osg::Object::DYNAMIC)
+//             {
+//                 // Add a copy, we will alternate between the two copies every other frame using the FrameSwitch
+//                 // This is so we can set the DataVariance as STATIC, giving a huge performance boost
+//                 geometry->setDataVariance(osg::Object::STATIC);
+//                 osg::ref_ptr<osg::Geode> geode2 = static_cast<osg::Geode*>(osg::clone(geode.get(), osg::CopyOp::DEEP_COPY_NODES|osg::CopyOp::DEEP_COPY_DRAWABLES));
+//                 osg::ref_ptr<FrameSwitch> frameswitch = new FrameSwitch;
+//                 frameswitch->addChild(geode);
+//                 frameswitch->addChild(geode2);
+//                 parentNode->addChild(frameswitch);
+//             }
+//             else
                 parentNode->addChild(geode);
         }
 
@@ -975,7 +975,7 @@ namespace NifOsg
             // No normals available in the MorphData
             morphGeom->setMorphNormals(false);
 
-            morphGeom->setUpdateCallback(NULL);
+//             morphGeom->setUpdateCallback(NULL);
             morphGeom->setCullCallback(new UpdateMorphGeometry);
 
             const std::vector<Nif::NiMorphData::MorphData>& morphs = morpher->data.getPtr()->mMorphs;
@@ -1018,7 +1018,7 @@ namespace NifOsg
                 box.expandBy(vertBounds[i]);
             }
 
-            morphGeom->setComputeBoundingBoxCallback(new StaticBoundingBoxCallback(box));
+//             morphGeom->setComputeBoundingBoxCallback(new StaticBoundingBoxCallback(box));
 
             return morphGeom;
         }

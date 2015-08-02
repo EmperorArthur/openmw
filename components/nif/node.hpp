@@ -50,6 +50,8 @@ public:
             boundRot = nif->getMatrix3();
             boundXYZ = nif->getVector3();
         }
+//         hasBounds=true;
+//         hasBounds=false;
 
         parent = NULL;
 
